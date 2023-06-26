@@ -1,3 +1,10 @@
+# -*- coding: utf-8 -*-
+"""
+Created on Wed Jun  7 11:02:20 2023
+
+@author: pinyo
+"""
+
 import cv2
 import dlib
 import numpy as np
@@ -6,7 +13,7 @@ import sys
 import csv
 import re
 import os
-import funcSkinSeparation2 as ss
+#import funcSkinSeparation2 as ss
 from imutils import face_utils
 
 def getVideoROI(img):
@@ -35,47 +42,47 @@ def DetectFeaturesRect(point, mask_width, mask_height):
 """
 
 #頬（右上）の四角形を作成
-def Detectupperright(point1, point2, mask_width, mask_height):
-    roi0 = point1[0]+(mask_width/7)
-    roi1 = point1[1]
-    roi2 = point2[0]+(mask_width/3)
-    roi3 = point2[1]
+def Detectupperright(point14, point30, point36, point34):
+    roi0 = point36[0]+20
+    roi1 = point30[1]
+    roi2 = point14[0]-10
+    roi3 = point34[1]
     roi = [int(roi0), int(roi1), int(roi2), int(roi3)]
     return roi
 
 #頬（左上）の四角形を作成
-def Detectupperleft(point1, point2, mask_width, mask_height):
-    roi0 = point1[0]-(mask_width/7)
-    roi1 = point1[1]
-    roi2 = point2[0]-(mask_width/3)
-    roi3 = point2[1]
+def Detectupperleft(point4, point30, point32,point34):
+    roi0 = point32[0]-20
+    roi1 = point30[1]
+    roi2 = point4[0]+10
+    roi3 = point34[1]
     roi = [int(roi0), int(roi1), int(roi2), int(roi3)]
     return roi
 
 #頬（右下）の四角形を作成
-def Detectbottomright(point1, point2, mask_width, mask_height):
-    roi0 = point1[0]+(mask_width/8)
-    roi1 = point1[1]
-    roi2 = point2[0]+(mask_width/3.5)
-    roi3 = point2[1]
+def Detectbottomright(point13, point55, point34):
+    roi0 = point55[0]+10
+    roi1 = point34[1]
+    roi2 = point13[0]
+    roi3 = point55[1]
     roi = [int(roi0), int(roi1), int(roi2), int(roi3)]
     return roi
 
 #頬（左下）の四角形を作成
-def Detectbottomleft(point1, point2, mask_width, mask_height):
-    roi0 = point1[0]-(mask_width/8)
-    roi1 = point1[1]
-    roi2 = point2[0]-(mask_width/3.5)
-    roi3 = point2[1]
+def Detectbottomleft(point5, point49, point34):
+    roi0 = point49[0]-10
+    roi1 = point34[1]
+    roi2 = point5[0]
+    roi3 = point49[1]
     roi = [int(roi0), int(roi1), int(roi2), int(roi3)]
     return roi
 
 #額の四角形を作成
-def Detecthead(point1, point2, mask_width, mask_height):
-    roi0 = point1[0]
-    roi1 = point1[1]-(mask_height/10)
-    roi2 = point2[0]
-    roi3 = point2[1]-(mask_height/2)
+def Detecthead(point20, point25):
+    roi0 = point20[0]
+    roi1 = point20[1]-10
+    roi2 = point25[0]
+    roi3 = point25[1]-50
     roi = [int(roi0), int(roi1), int(roi2), int(roi3)]
     return roi
 
@@ -106,11 +113,11 @@ def output(R, G, B, dir_name, name):
 #dir_name = 'C:\\Users\\koike\\Desktop\\local_remote\\image_data\\210111\\002\\Cam 1\\'
 #dir_name = 'C:\\Users\\elite\\Documents\\oflinetestdata\\'
 #dir_name = 'F:\\test_img\\test\\'
-dir_name = 'E:\\2023_5_1\\No-06-2023-0404\\'
+dir_name = 'D:\\2023_5_1\\No-22-2023-0404\\'
 
 #files = glob.glob(dir_name+'*')
 #files = glob.glob(dir_name+'*.bmp')
-files = glob.glob(dir_name+'colorChartImage_20230203_090000.png')
+files = glob.glob(dir_name+'calibratedFaceImage.20230131.090000.png')
 
 num = len(files)
 # print(num)
@@ -170,22 +177,32 @@ for f in files:
     shapes = DetectFaceFeatures(detector, img_gry, face_predictor)
     
     #鼻の点と縦横の長さを計算
+    point4 = shapes[3,:]
+    point5 = shapes[4,:]
+    point13 = shapes[12,:]
+    point14 = shapes[13,:]
     point20 = shapes[19,:]
     point25 = shapes[24,:]
-    point30 = shapes[29,:]
+    point30 = shapes[29,:] #頬上の点
     point32 = shapes[31,:]
+    point34 = shapes[33,:]
     point36 = shapes[35,:]
+    point49 = shapes[48,:]
     point50 = shapes[49,:]
+    point52 = shapes[51,:]
     point54 = shapes[53,:]
+    point55 = shapes[54,:]
+    
+    height = point34[1] + (point52[1]-point34[1])/2
     #print(point)
-    mask_width = shapes[14,0]-shapes[2,0]
-    mask_height = shapes[51,1]-shapes[29,1]
+    #mask_width = shapes[14,0]-shapes[2,0]
+    #mask_height = shapes[51,1]-shapes[29,1]
     #roi = DetectFeaturesRect(point, mask_width, mask_height) 
-    roi_upperright = Detectupperright(point30, point36, mask_width, mask_height)
-    roi_upperleft = Detectupperleft(point30, point32, mask_width, mask_height)
-    roi_bottomright = Detectbottomright(point36, point54, mask_width, mask_height)
-    roi_bottomleft = Detectbottomleft(point32, point50, mask_width, mask_height)
-    roi_head = Detecthead(point20, point25, mask_width, mask_height)
+    roi_upperright = Detectupperright(point14, point30, point36, point34)
+    roi_upperleft = Detectupperleft(point4, point30,point32, point34)
+    roi_bottomright = Detectbottomright(point13, point55, point34)
+    roi_bottomleft = Detectbottomleft(point5, point49, point34)
+    roi_head = Detecthead(point20, point25)
 
     
     #バウンディングボックスの描画
@@ -288,7 +305,7 @@ output(Rupperleft[0],Gupperleft[0],Bupperleft[0], dir_name, name)
 name = "bottomleft"
 output(Rbottomleft[0],Gbottomleft[0],Bbottomleft[0], dir_name, name)
 name = "head"
-output(Rhead,Ghead,Bhead, dir_name, name)
+output(Rhead[0],Ghead[0],Bhead[0], dir_name, name)
 
 
 
